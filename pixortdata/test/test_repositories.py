@@ -49,3 +49,15 @@ class TestRawRepo(unittest.TestCase):
 
         with self.assertRaises(exceptions.DuplicateEntry):
             repo.create("somekey", "othervalue")
+
+    def test_get_non_existing_entry(self):
+        repo = self.create_repository()
+
+        with self.assertRaises(exceptions.NotFound):
+            repo.get(123)
+
+    def test_idx_non_existing_entry(self):
+        repo = self.create_repository()
+
+        with self.assertRaises(exceptions.NotFound):
+            repo.by_key("stg")

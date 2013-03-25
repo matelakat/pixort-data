@@ -19,8 +19,14 @@ class InMemory(object):
         return id
 
     def get(self, id):
-        return self.contents[id]
+        try:
+            return self.contents[id]
+        except KeyError:
+            raise exceptions.NotFound(id)
 
     def by_key(self, key):
+        if key not in self._keys:
+            raise exceptions.NotFound(key)
+
         id = self._keys.index(key)
         return self.contents[id]
