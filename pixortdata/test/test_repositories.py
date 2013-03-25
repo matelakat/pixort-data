@@ -3,10 +3,7 @@ from pixortdata import repositories
 from pixortdata import exceptions
 
 
-class TestInMemoryRepo(unittest.TestCase):
-    def create_repository(self):
-        return repositories.InMemory()
-
+class RepoTests(object):
     def test_empty(self):
         repo = self.create_repository()
 
@@ -61,3 +58,8 @@ class TestInMemoryRepo(unittest.TestCase):
 
         with self.assertRaises(exceptions.NotFound):
             repo.by_key("stg")
+
+
+class TestInMemoryRepo(RepoTests, unittest.TestCase):
+    def create_repository(self):
+        return repositories.InMemory()
