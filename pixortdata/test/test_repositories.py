@@ -25,7 +25,7 @@ class TestInMemoryRepo(unittest.TestCase):
         id = repo.create("somekey", "somevalue")
         value = repo.get(id)
 
-        self.assertEquals("somevalue", value)
+        self.assertEquals("somevalue", value.raw_value)
 
     def test_get_by_key(self):
         repo = self.create_repository()
@@ -33,7 +33,7 @@ class TestInMemoryRepo(unittest.TestCase):
         repo.create("somekey", "somevalue")
         value = repo.by_key("somekey")
 
-        self.assertEquals("somevalue", value)
+        self.assertEquals("somevalue", value.raw_value)
 
     def test_non_empty_listing(self):
         repo = self.create_repository()

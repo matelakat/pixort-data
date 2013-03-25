@@ -1,4 +1,5 @@
 from pixortdata import exceptions
+from pixortdata import models
 
 
 class InMemory(object):
@@ -15,7 +16,7 @@ class InMemory(object):
             raise exceptions.DuplicateEntry(key)
         self._keys.append(key)
         id = self._keys.index(key)
-        self.contents[id] = value
+        self.contents[id] = models.RawValue(value)
         return id
 
     def get(self, id):
