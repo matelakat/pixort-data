@@ -60,6 +60,11 @@ class RepoTests(object):
             repo.by_key("stg")
 
 
+class TestAlchemyRepo(RepoTests, unittest.TestCase):
+    def create_repository(self):
+        return repositories.AlchemyRepo()
+
+
 class TestInMemoryRepo(RepoTests, unittest.TestCase):
     def create_repository(self):
         return repositories.InMemory()

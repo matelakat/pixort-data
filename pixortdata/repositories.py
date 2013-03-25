@@ -1,6 +1,21 @@
 from pixortdata import exceptions
 from pixortdata import models
 
+import sqlalchemy
+
+
+class AlchemyRepo(object):
+    def __init__(self):
+        self._engine = sqlalchemy.create_engine('sqlite:///:memory:')
+        models.Base.metadata.create_all(bind=self._engine)
+        self._session = sqlalchemy.orm.sessionmaker()
+
+    def create(self, key, value):
+        session = self._session()
+        raw = models.SARaw()
+        session.add(raw)
+        session.flush()
+
 
 class InMemory(object):
 
