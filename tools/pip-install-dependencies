@@ -1,0 +1,2 @@
+#!/bin/bash
+pip install -r tools/pip-requires.txt --no-index --find-links="file://`pwd`/dependencies/"

@@ -1,0 +1,3 @@
+#!/bin/bash
+set -u
+pip install --no-deps -d dependencies/ --no-install $1
