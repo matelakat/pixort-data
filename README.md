@@ -15,3 +15,7 @@ All the packages are cached under `dependencies/`. Download a package by:
 Setup your production environment by running:
 
     tools/pip-install-dependencies
+
+To also set-up the test requirements, run:
+
+    tools/pip-install-dependencies test

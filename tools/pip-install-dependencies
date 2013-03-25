@@ -1,2 +1,12 @@
 #!/bin/bash
-pip install -r tools/pip-requires.txt --no-index --find-links="file://`pwd`/dependencies/"
+set -x
+
+function install_dependencies () {
+    pip install -r $1 --no-index --find-links="file://`pwd`/dependencies/"
+}
+
+install_dependencies tools/pip-requires.txt
+
+[ "$1" = "test" ] && {
+    install_dependencies tools/test-requires.txt
+}
