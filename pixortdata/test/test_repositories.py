@@ -3,7 +3,7 @@ from pixortdata import repositories
 from pixortdata import exceptions
 
 
-class TestRawRepo(unittest.TestCase):
+class TestInMemoryRepo(unittest.TestCase):
     def create_repository(self):
         return repositories.InMemory()
 
