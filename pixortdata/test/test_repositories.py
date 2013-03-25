@@ -1,5 +1,6 @@
 import unittest
 from pixortdata import repositories
+from pixortdata import exceptions
 
 
 class TestRawRepo(unittest.TestCase):
@@ -40,3 +41,11 @@ class TestRawRepo(unittest.TestCase):
         repo.create("somekey", "somevalue")
 
         self.assertEquals(["somekey"], list(repo.keys()))
+
+    def test_duplicate_entry(self):
+        repo = self.create_repository()
+
+        repo.create("somekey", "somevalue")
+
+        with self.assertRaises(exceptions.DuplicateEntry):
+            repo.create("somekey", "othervalue")

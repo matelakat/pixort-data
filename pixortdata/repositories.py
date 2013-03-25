@@ -1,3 +1,6 @@
+from pixortdata import exceptions
+
+
 class InMemory(object):
 
     def __init__(self):
@@ -8,6 +11,8 @@ class InMemory(object):
         return self._keys
 
     def create(self, key, value):
+        if key in self._keys:
+            raise exceptions.DuplicateEntry(key)
         self._keys.append(key)
         id = self._keys.index(key)
         self.contents[id] = value
