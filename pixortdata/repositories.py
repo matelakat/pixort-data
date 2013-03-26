@@ -10,11 +10,7 @@ log.setLevel(logging.INFO)
 
 
 def inmemory_alchemy_session():
-    logging.basicConfig()
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-    engine = sqlalchemy.create_engine('sqlite:///')
-    models.Base.metadata.create_all(engine)
-    return AlchemySession(sqlalchemy.orm.sessionmaker(bind=engine)())
+    return filesystem_alchemy_session('sqlite:///', create_schema=True)
 
 
 def filesystem_alchemy_session(url, create_schema=False):
