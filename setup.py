@@ -8,6 +8,9 @@ setup(
     entry_points={
         'console_scripts': [
             'pixort-data-init = pixortdata.scripts:init',
+            'pixort-data-version = pixortdata.scripts:version',
+            'pixort-data-upgrade = pixortdata.scripts:upgrade',
+            'pixort-data-revision = pixortdata.scripts:revision',
         ]
     }
 )
