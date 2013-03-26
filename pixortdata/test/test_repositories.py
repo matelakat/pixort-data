@@ -37,7 +37,7 @@ class RepoTests(object):
 
         repo.create("somekey", "somevalue")
 
-        self.assertEquals(["somekey"], list(repo.keys()))
+        self.assertEquals(["somekey"], [k for k in repo.keys()])
 
     def test_duplicate_entry(self):
         repo = self.create_repository()
