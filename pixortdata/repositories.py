@@ -3,40 +3,45 @@ from pixortdata import models
 
 import sqlalchemy
 
+import logging
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+
+
 
 class AlchemyRepo(object):
-    def __init__(self):
-        engine = sqlalchemy.create_engine('sqlite:///:memory:')
+    def __init__(self, url='sqlite:///:memory:'):
+        logging.basicConfig()
+        logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+        engine = sqlalchemy.create_engine(url)
         models.Base.metadata.create_all(engine)
-        self._session = sqlalchemy.orm.sessionmaker(bind=engine)
+        self.session = sqlalchemy.orm.sessionmaker(bind=engine)()
 
     def create(self, key, value):
         try:
-            session = self._session()
             raw = models.SARaw(key=key, raw_value=value)
-            session.add(raw)
-            session.flush()
+            self.session.add(raw)
+            self.session.flush()
+            self.session.commit()
             return raw.id
         except sqlalchemy.exc.IntegrityError:
             raise exceptions.DuplicateEntry(key)
 
     def keys(self):
-        session = self._session()
-        for key, in session.query(models.SARaw.key):
+        for key, in self.session.query(models.SARaw.key):
             yield key
 
     def get(self, id):
         try:
-            session = self._session()
-            q = session.query(models.SARaw).filter(models.SARaw.id==id)
+            q = self.session.query(models.SARaw).filter(models.SARaw.id==id)
             return q.one()
         except sqlalchemy.orm.exc.NoResultFound:
             raise exceptions.NotFound(id)
 
     def by_key(self, key):
         try:
-            session = self._session()
-            q = session.query(models.SARaw).filter(models.SARaw.key==key)
+            q = self.session.query(models.SARaw).filter(models.SARaw.key==key)
             return q.one()
         except sqlalchemy.orm.exc.NoResultFound:
             raise exceptions.NotFound(key)

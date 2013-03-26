@@ -1,6 +1,9 @@
 import unittest
 from pixortdata import repositories
 from pixortdata import exceptions
+import tempfile
+import os
+import contextlib
 
 
 class RepoTests(object):
@@ -58,6 +61,29 @@ class RepoTests(object):
 
         with self.assertRaises(exceptions.NotFound):
             repo.by_key("stg")
+
+
+@contextlib.contextmanager
+def tempdb():
+    with tempfile.NamedTemporaryFile(delete=False) as tf:
+        tf.close()
+        try:
+            yield "sqlite:///" + os.path.abspath(tf.name)
+        finally:
+            os.unlink(tf.name)
+
+
+class TestPersistency(unittest.TestCase):
+    def create_repository(self, url):
+        return repositories.AlchemyRepo(url=url)
+
+    def test_change_persists(self):
+        with tempdb() as dburl:
+            repo = self.create_repository(dburl)
+            id = repo.create('key', 'value')
+
+            repo = self.create_repository(dburl)
+            self.assertTrue(repo.get(id))
 
 
 class TestAlchemyRepo(RepoTests, unittest.TestCase):
