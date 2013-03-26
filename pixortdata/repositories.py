@@ -9,14 +9,26 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 
+def inmemory_alchemy_session():
+    logging.basicConfig()
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    engine = sqlalchemy.create_engine('sqlite:///')
+    models.Base.metadata.create_all(engine)
+    return AlchemySession(sqlalchemy.orm.sessionmaker(bind=engine)())
 
-class AlchemyRepo(object):
-    def __init__(self, url='sqlite:///:memory:'):
-        logging.basicConfig()
-        logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-        engine = sqlalchemy.create_engine(url)
+
+def filesystem_alchemy_session(url, create_schema=False):
+    logging.basicConfig()
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    engine = sqlalchemy.create_engine(url)
+    if create_schema:
         models.Base.metadata.create_all(engine)
-        self.session = sqlalchemy.orm.sessionmaker(bind=engine)()
+    return AlchemySession(sqlalchemy.orm.sessionmaker(bind=engine)())
+
+
+class AlchemySession(object):
+    def __init__(self, session):
+        self.session = session
 
     def create(self, key, value):
         try:

@@ -75,7 +75,8 @@ def tempdb():
 
 class TestPersistency(unittest.TestCase):
     def create_repository(self, url):
-        return repositories.AlchemyRepo(url=url)
+        return repositories.filesystem_alchemy_session(
+            url, create_schema=True)
 
     def test_change_persists(self):
         with tempdb() as dburl:
@@ -86,9 +87,9 @@ class TestPersistency(unittest.TestCase):
             self.assertTrue(repo.get(id))
 
 
-class TestAlchemyRepo(RepoTests, unittest.TestCase):
+class TestAlchemySession(RepoTests, unittest.TestCase):
     def create_repository(self):
-        return repositories.AlchemyRepo()
+        return repositories.inmemory_alchemy_session()
 
 
 class TestInMemoryRepo(RepoTests, unittest.TestCase):
