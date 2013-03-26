@@ -19,3 +19,18 @@ Setup your production environment by running:
 To also set-up the test requirements, run:
 
     tools/pip-install-dependencies test
+
+### Database Initialisation
+To create the tables in the database, execute:
+
+    pixort-data-init sqlite:///db
+
+### Database Setup
+Some comments to flush to a blogpost.
+
+Initial alembic install was:
+
+    alembic init pixortdata/migrations -t generic
+
+After that, the file `pixortdata/migrations/env.py` had to be modified, namely
+the logging configuration was removed.
