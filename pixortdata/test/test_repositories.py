@@ -19,6 +19,14 @@ class RepoTests(object):
 
         self.assertTrue(id is not None)
 
+    def test_store_big_data(self):
+        repo = self.create_repository()
+
+        id = repo.create("somekey", " " * 1024 * 8)
+        value = repo.get(id)
+
+        self.assertEquals(" " * 1024 * 8, value.raw_value)
+
     def test_get_by_id(self):
         repo = self.create_repository()
 
