@@ -34,3 +34,8 @@ Initial alembic install was:
 
 After that, the file `pixortdata/migrations/env.py` had to be modified, namely
 the logging configuration was removed.
+
+## Import Metadata
+To import metadata from a filestore:
+
+    python tools/import_metadata_from_filestore.py file:///data/320thumbs sqlite:///db
