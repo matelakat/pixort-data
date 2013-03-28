@@ -22,34 +22,50 @@ def filesystem_alchemy_session(url, create_schema=False):
     return AlchemySession(sqlalchemy.orm.sessionmaker(bind=engine)())
 
 
-class AlchemySession(object):
-    def __init__(self, session):
+class SARepo(object):
+    def __init__(self, session, cls_to_store):
         self.session = session
+        self.cls_to_store = cls_to_store
 
-    def create(self, key, value):
+    def create(self, **kwargs):
         try:
-            raw = models.SARaw(key=key, raw_value=value)
+            raw = self.cls_to_store(**kwargs)
             self.session.add(raw)
             self.session.flush()
             self.session.commit()
             return raw.id
         except sqlalchemy.exc.IntegrityError:
-            raise exceptions.DuplicateEntry(key)
-
-    def keys(self):
-        for key, in self.session.query(models.SARaw.key):
-            yield key
+            raise exceptions.DuplicateEntry(kwargs)
 
     def get(self, id):
         try:
-            q = self.session.query(models.SARaw).filter(models.SARaw.id==id)
+            q = self.query().filter(
+                self.cls_to_store.id==id)
             return q.one()
         except sqlalchemy.orm.exc.NoResultFound:
             raise exceptions.NotFound(id)
 
+    def query(self):
+        return self.session.query(self.cls_to_store)
+
+
+class AlchemySession(object):
+    def __init__(self, session):
+        self.sarepo = SARepo(session, models.SARaw)
+
+    def create(self, key, value):
+        return self.sarepo.create(key=key, raw_value=value)
+
+    def get(self, id):
+        return self.sarepo.get(id)
+
+    def keys(self):
+        for saraw in self.sarepo.query():
+            yield saraw.key
+
     def by_key(self, key):
         try:
-            q = self.session.query(models.SARaw).filter(models.SARaw.key==key)
+            q = self.sarepo.query().filter(models.SARaw.key==key)
             return q.one()
         except sqlalchemy.orm.exc.NoResultFound:
             raise exceptions.NotFound(key)
