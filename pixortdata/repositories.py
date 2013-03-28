@@ -81,29 +81,9 @@ class InMemRepo(object):
                 yield obj
 
 
-class AlchemySession(object):
-    def __init__(self, session):
-        self.sarepo = SARepo(session, models.SARaw)
-
-    def create(self, key, value):
-        return self.sarepo.create(key=key, raw_value=value)
-
-    def get(self, id):
-        return self.sarepo.get(id)
-
-    def keys(self):
-        for saraw in self.sarepo.query():
-            yield saraw.key
-
-    def by_key(self, key):
-        for obj in self.sarepo.query(lambda x: x.key==key):
-            return obj
-        raise exceptions.NotFound(key)
-
-
-class InMemory(object):
-    def __init__(self):
-        self.repo = InMemRepo(models.RawValue, ["key"])
+class RawRepo(object):
+    def __init__(self, repo):
+        self.repo = repo
 
     def create(self, key, value):
         return self.repo.create(key=key, raw_value=value)
@@ -119,3 +99,14 @@ class InMemory(object):
         for obj in self.repo.query(lambda x: x.key==key):
             return obj
         raise exceptions.NotFound(key)
+
+
+class AlchemySession(RawRepo):
+    def __init__(self, session):
+        super(AlchemySession, self).__init__(SARepo(session, models.SARaw))
+
+
+class InMemory(RawRepo):
+    def __init__(self):
+        super(InMemory, self).__init__(InMemRepo(models.RawValue, ["key"]))
+
