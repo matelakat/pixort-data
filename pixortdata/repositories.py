@@ -75,16 +75,18 @@ class InMemRepo(object):
     def __init__(self, cls, unique_fields):
         self.objects = []
         self.cls = cls
+        self.unique_fields = unique_fields
 
     def create(self, key, raw_value):
-        for obj in self.objects:
-            if key == obj.key:
-                raise exceptions.DuplicateEntry(key)
+        new_obj = self.cls(key, raw_value)
 
-        obj = self.cls(key, raw_value)
-        self.objects.append(obj)
-        id = self.objects.index(obj)
-        return id
+        for field in self.unique_fields:
+            for obj in self.objects:
+                if getattr(new_obj, field) == getattr(obj, field):
+                    raise exceptions.DuplicateEntry()
+
+        self.objects.append(new_obj)
+        return self.objects.index(new_obj)
 
     def get(self, id):
         try:
