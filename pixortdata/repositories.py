@@ -71,32 +71,44 @@ class AlchemySession(object):
             raise exceptions.NotFound(key)
 
 
-class InMemory(object):
+class InMemRepo(object):
+    def __init__(self, cls, unique_fields):
+        self.objects = []
+        self.cls = cls
 
-    def __init__(self):
-        self._keys = []
-        self.contents = dict()
+    def create(self, key, raw_value):
+        for obj in self.objects:
+            if key == obj.key:
+                raise exceptions.DuplicateEntry(key)
 
-    def keys(self):
-        return self._keys
-
-    def create(self, key, value):
-        if key in self._keys:
-            raise exceptions.DuplicateEntry(key)
-        self._keys.append(key)
-        id = self._keys.index(key)
-        self.contents[id] = models.RawValue(value)
+        obj = self.cls(key, raw_value)
+        self.objects.append(obj)
+        id = self.objects.index(obj)
         return id
 
     def get(self, id):
         try:
-            return self.contents[id]
-        except KeyError:
+            return self.objects[id]
+        except IndexError:
             raise exceptions.NotFound(id)
 
-    def by_key(self, key):
-        if key not in self._keys:
-            raise exceptions.NotFound(key)
 
-        id = self._keys.index(key)
-        return self.contents[id]
+class InMemory(object):
+    def __init__(self):
+        self.repo = InMemRepo(models.RawValue, ["key"])
+
+    def keys(self):
+        for obj in self.repo.objects:
+            yield obj.key
+
+    def create(self, key, value):
+        return self.repo.create(key=key, raw_value=value)
+
+    def get(self, id):
+        return self.repo.get(id)
+
+    def by_key(self, key):
+        for obj in self.repo.objects:
+            if obj.key == key:
+                return obj
+        raise exceptions.NotFound(key)

@@ -1,6 +1,7 @@
 class RawValue(object):
-    def __init__(self, raw_value):
+    def __init__(self, key, raw_value):
         self.raw_value = raw_value
+        self.key = key
 
 
 from sqlalchemy.ext.declarative import declarative_base
