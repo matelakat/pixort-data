@@ -52,26 +52,6 @@ class SARepo(object):
             yield obj
 
 
-class AlchemySession(object):
-    def __init__(self, session):
-        self.sarepo = SARepo(session, models.SARaw)
-
-    def create(self, key, value):
-        return self.sarepo.create(key=key, raw_value=value)
-
-    def get(self, id):
-        return self.sarepo.get(id)
-
-    def keys(self):
-        for saraw in self.sarepo.query():
-            yield saraw.key
-
-    def by_key(self, key):
-        for obj in self.sarepo.query(lambda x: x.key==key):
-            return obj
-        raise exceptions.NotFound(key)
-
-
 class InMemRepo(object):
     def __init__(self, cls, unique_fields):
         self.objects = []
@@ -99,6 +79,26 @@ class InMemRepo(object):
         for obj in self.objects:
             if False not in [r(obj) for r in conditions]:
                 yield obj
+
+
+class AlchemySession(object):
+    def __init__(self, session):
+        self.sarepo = SARepo(session, models.SARaw)
+
+    def create(self, key, value):
+        return self.sarepo.create(key=key, raw_value=value)
+
+    def get(self, id):
+        return self.sarepo.get(id)
+
+    def keys(self):
+        for saraw in self.sarepo.query():
+            yield saraw.key
+
+    def by_key(self, key):
+        for obj in self.sarepo.query(lambda x: x.key==key):
+            return obj
+        raise exceptions.NotFound(key)
 
 
 class InMemory(object):
