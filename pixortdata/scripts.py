@@ -21,7 +21,7 @@ def version():
         description='Print out the actual version of the database')
     parser.add_argument('dburl', help='Database URL for SQLAlchemy')
     args = parser.parse_args()
-    repositories.filesystem_alchemy_session(url=args.dburl, create_schema=False)
+    repositories.filesystem_alchemy_session(url=args.dburl)
 
     from alembic.config import Config
     from alembic import command
@@ -35,7 +35,7 @@ def upgrade():
     parser = argparse.ArgumentParser(description='Upgrade database schema')
     parser.add_argument('dburl', help='Database URL for SQLAlchemy')
     args = parser.parse_args()
-    repositories.filesystem_alchemy_session(url=args.dburl, create_schema=False)
+    repositories.filesystem_alchemy_session(url=args.dburl)
 
     from alembic.config import Config
     from alembic import command
@@ -52,7 +52,7 @@ def revision():
     parser.add_argument('--autogenerate', help='Autogenerate',
                         action='store_true')
     args = parser.parse_args()
-    repositories.filesystem_alchemy_session(url=args.dburl, create_schema=False)
+    repositories.filesystem_alchemy_session(url=args.dburl)
 
     from alembic.config import Config
     from alembic import command
