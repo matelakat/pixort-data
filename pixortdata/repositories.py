@@ -38,15 +38,18 @@ class SARepo(object):
             raise exceptions.DuplicateEntry(kwargs)
 
     def get(self, id):
-        try:
-            q = self.query().filter(
-                self.cls_to_store.id==id)
-            return q.one()
-        except sqlalchemy.orm.exc.NoResultFound:
-            raise exceptions.NotFound(id)
+        for obj in self.query(lambda x: x.id==id):
+            return obj
+        raise exceptions.NotFound(id)
 
-    def query(self):
-        return self.session.query(self.cls_to_store)
+    def query(self, *conditions):
+        q = self.session.query(self.cls_to_store)
+
+        for condition in conditions:
+            q = q.filter(condition(self.cls_to_store))
+
+        for obj in q:
+            yield obj
 
 
 class AlchemySession(object):
@@ -64,11 +67,9 @@ class AlchemySession(object):
             yield saraw.key
 
     def by_key(self, key):
-        try:
-            q = self.sarepo.query().filter(models.SARaw.key==key)
-            return q.one()
-        except sqlalchemy.orm.exc.NoResultFound:
-            raise exceptions.NotFound(key)
+        for obj in self.sarepo.query(lambda x: x.key==key):
+            return obj
+        raise exceptions.NotFound(key)
 
 
 class InMemRepo(object):
