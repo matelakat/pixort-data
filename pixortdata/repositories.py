@@ -95,14 +95,15 @@ class InMemRepo(object):
         except IndexError:
             raise exceptions.NotFound(id)
 
+    def query(self, *conditions):
+        for obj in self.objects:
+            if False not in [r(obj) for r in conditions]:
+                yield obj
+
 
 class InMemory(object):
     def __init__(self):
         self.repo = InMemRepo(models.RawValue, ["key"])
-
-    def keys(self):
-        for obj in self.repo.objects:
-            yield obj.key
 
     def create(self, key, value):
         return self.repo.create(key=key, raw_value=value)
@@ -110,8 +111,11 @@ class InMemory(object):
     def get(self, id):
         return self.repo.get(id)
 
+    def keys(self):
+        for obj in self.repo.query():
+            yield obj.key
+
     def by_key(self, key):
-        for obj in self.repo.objects:
-            if obj.key == key:
-                return obj
+        for obj in self.repo.query(lambda x: x.key==key):
+            return obj
         raise exceptions.NotFound(key)
