@@ -1,5 +1,7 @@
 import argparse
 from pixortdata import repositories
+from alembic.config import Config
+from alembic import command
 
 
 def init():
@@ -8,8 +10,6 @@ def init():
     args = parser.parse_args()
     repositories.filesystem_alchemy_session(url=args.dburl, create_schema=True)
 
-    from alembic.config import Config
-    from alembic import command
     cfg = Config()
     cfg.set_main_option("script_location", "pixortdata:migrations")
     cfg.set_main_option("sqlalchemy.url", args.dburl)
@@ -23,8 +23,6 @@ def version():
     args = parser.parse_args()
     repositories.filesystem_alchemy_session(url=args.dburl)
 
-    from alembic.config import Config
-    from alembic import command
     cfg = Config()
     cfg.set_main_option("script_location", "pixortdata:migrations")
     cfg.set_main_option("sqlalchemy.url", args.dburl)
@@ -37,8 +35,6 @@ def upgrade():
     args = parser.parse_args()
     repositories.filesystem_alchemy_session(url=args.dburl)
 
-    from alembic.config import Config
-    from alembic import command
     cfg = Config()
     cfg.set_main_option("script_location", "pixortdata:migrations")
     cfg.set_main_option("sqlalchemy.url", args.dburl)
@@ -54,8 +50,6 @@ def revision():
     args = parser.parse_args()
     repositories.filesystem_alchemy_session(url=args.dburl)
 
-    from alembic.config import Config
-    from alembic import command
     cfg = Config()
     cfg.set_main_option("script_location", "pixortdata:migrations")
     cfg.set_main_option("sqlalchemy.url", args.dburl)
