@@ -12,6 +12,14 @@ class RepoTests(object):
 
         self.assertEquals([], list(repo.keys()))
 
+    def test_id_stored_on_object(self):
+        repo = self.create_repository()
+
+        id = repo.create("somekey", "somevalue")
+        value = repo.get(id)
+
+        self.assertEquals(id, value.id)
+
     def test_create_returns_an_id(self):
         repo = self.create_repository()
 

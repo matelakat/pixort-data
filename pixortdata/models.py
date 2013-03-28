@@ -1,5 +1,6 @@
 class RawValue(object):
     def __init__(self, key, raw_value):
+        self.id = None
         self.raw_value = raw_value
         self.key = key
 

@@ -67,7 +67,9 @@ class InMemRepo(object):
                     raise exceptions.DuplicateEntry()
 
         self.objects.append(new_obj)
-        return self.objects.index(new_obj)
+        id = self.objects.index(new_obj)
+        new_obj.id = id
+        return id
 
     def get(self, id):
         try:
