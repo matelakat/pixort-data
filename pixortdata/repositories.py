@@ -101,12 +101,9 @@ class RawRepo(object):
         raise exceptions.NotFound(key)
 
 
-class AlchemySession(RawRepo):
-    def __init__(self, session):
-        super(AlchemySession, self).__init__(SARepo(session, models.SARaw))
+def AlchemySession(session):
+    return RawRepo(SARepo(session, models.SARaw))
 
 
-class InMemory(RawRepo):
-    def __init__(self):
-        super(InMemory, self).__init__(InMemRepo(models.RawValue, ["key"]))
-
+def InMemory():
+    return RawRepo(InMemRepo(models.RawValue, ["key"]))
