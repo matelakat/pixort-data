@@ -10,10 +10,10 @@ log.setLevel(logging.INFO)
 
 
 def inmemory_sa_pixort_data():
-    return filesystem_alchemy_session('sqlite:///', create_schema=True)
+    return sa_pixort_data('sqlite:///', create_schema=True)
 
 
-def filesystem_alchemy_session(url, create_schema=False):
+def sa_pixort_data(url, create_schema=False):
     logging.basicConfig()
     logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     engine = sqlalchemy.create_engine(url)

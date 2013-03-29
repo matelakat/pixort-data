@@ -91,7 +91,7 @@ def tempdb():
 
 class TestPersistency(unittest.TestCase):
     def create_repository(self, url):
-        return repositories.filesystem_alchemy_session(
+        return repositories.sa_pixort_data(
             url, create_schema=True)
 
     def test_change_persists(self):
