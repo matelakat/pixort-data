@@ -87,7 +87,7 @@ class PixortData(object):
     def __init__(self, raw_repo):
         self.raw_repo = raw_repo
 
-    def create(self, key, value):
+    def create_raw(self, key, value):
         return self.raw_repo.create(key=key, raw_value=value)
 
     def get(self, id):

@@ -15,7 +15,7 @@ class RepoTests(object):
     def test_id_stored_on_object(self):
         repo = self.create_repository()
 
-        id = repo.create("somekey", "somevalue")
+        id = repo.create_raw("somekey", "somevalue")
         value = repo.get(id)
 
         self.assertEquals(id, value.id)
@@ -23,14 +23,14 @@ class RepoTests(object):
     def test_create_returns_an_id(self):
         repo = self.create_repository()
 
-        id = repo.create("somekey", "somevalue")
+        id = repo.create_raw("somekey", "somevalue")
 
         self.assertTrue(id is not None)
 
     def test_store_big_data(self):
         repo = self.create_repository()
 
-        id = repo.create("somekey", " " * 1024 * 8)
+        id = repo.create_raw("somekey", " " * 1024 * 8)
         value = repo.get(id)
 
         self.assertEquals(" " * 1024 * 8, value.raw_value)
@@ -38,7 +38,7 @@ class RepoTests(object):
     def test_get_by_id(self):
         repo = self.create_repository()
 
-        id = repo.create("somekey", "somevalue")
+        id = repo.create_raw("somekey", "somevalue")
         value = repo.get(id)
 
         self.assertEquals("somevalue", value.raw_value)
@@ -46,7 +46,7 @@ class RepoTests(object):
     def test_get_by_key(self):
         repo = self.create_repository()
 
-        repo.create("somekey", "somevalue")
+        repo.create_raw("somekey", "somevalue")
         value = repo.by_key("somekey")
 
         self.assertEquals("somevalue", value.raw_value)
@@ -54,17 +54,17 @@ class RepoTests(object):
     def test_non_empty_listing(self):
         repo = self.create_repository()
 
-        repo.create("somekey", "somevalue")
+        repo.create_raw("somekey", "somevalue")
 
         self.assertEquals(["somekey"], [k for k in repo.keys()])
 
     def test_duplicate_entry(self):
         repo = self.create_repository()
 
-        repo.create("somekey", "somevalue")
+        repo.create_raw("somekey", "somevalue")
 
         with self.assertRaises(exceptions.DuplicateEntry):
-            repo.create("somekey", "othervalue")
+            repo.create_raw("somekey", "othervalue")
 
     def test_get_non_existing_entry(self):
         repo = self.create_repository()
@@ -97,7 +97,7 @@ class TestPersistency(unittest.TestCase):
     def test_change_persists(self):
         with tempdb() as dburl:
             repo = self.create_repository(dburl)
-            id = repo.create('key', 'value')
+            id = repo.create_raw('key', 'value')
 
             repo = self.create_repository(dburl)
             self.assertTrue(repo.get(id))
