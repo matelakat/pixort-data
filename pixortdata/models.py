@@ -1,17 +1,45 @@
-class RawValue(object):
-    def __init__(self, key, raw_value):
+class RawBO(object):
+    def tag_with(self, category):
+        pass
+
+
+class ClassificationBO(object):
+    def add_category(self, name):
+        cat = self._create_category(name)
+        self.categories.append(cat)
+        return cat
+
+
+class Category(object):
+    def __init__(self, name):
+        self.name = name
+
+
+class Classification(ClassificationBO):
+    def __init__(self, name=None):
         self.id = None
-        self.raw_value = raw_value
-        self.key = key
+        self.name = name
+        self.categories = []
+
+    def _create_category(self, name):
+        return Category(name=name)
+
+
+class RawValue(RawBO):
+    def __init__(self, **kwargs):
+        self.id = None
+        self.raw_value = kwargs.get('raw_value')
+        self.key = kwargs.get('key')
 
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
 
-class SARaw(Base):
+class SARaw(Base, RawBO):
     __tablename__ = 'raw'
 
     id = Column(Integer, primary_key=True)
@@ -35,8 +63,13 @@ class SACategory(Base):
     name = Column(String, nullable=False)
 
 
-class SAClassification(Base):
+class SAClassification(Base, ClassificationBO):
     __tablename__ = 'classifications'
 
     id = Column(Integer, primary_key=True)
-    category = Column(String)
+    name = Column(String, unique=True, nullable=False)
+
+    categories = relationship("SACategory")
+
+    def _create_category(self, name):
+        return SACategory(name=name)

@@ -6,7 +6,7 @@ import os
 import contextlib
 
 
-class RepoTests(object):
+class RawTests(object):
     def test_empty(self):
         repo = self.create_repository()
 
@@ -15,33 +15,16 @@ class RepoTests(object):
     def test_id_stored_on_object(self):
         repo = self.create_repository()
 
-        id = repo.create_raw("somekey", "somevalue")
-        value = repo.get_raw(id)
+        raw = repo.create_raw("somekey", "somevalue")
 
-        self.assertEquals(id, value.id)
-
-    def test_create_returns_an_id(self):
-        repo = self.create_repository()
-
-        id = repo.create_raw("somekey", "somevalue")
-
-        self.assertTrue(id is not None)
+        self.assertFalse(raw is None)
 
     def test_store_big_data(self):
         repo = self.create_repository()
 
-        id = repo.create_raw("somekey", " " * 1024 * 8)
-        value = repo.get_raw(id)
+        raw = repo.create_raw("somekey", " " * 1024 * 8)
 
-        self.assertEquals(" " * 1024 * 8, value.raw_value)
-
-    def test_get_by_id(self):
-        repo = self.create_repository()
-
-        id = repo.create_raw("somekey", "somevalue")
-        value = repo.get_raw(id)
-
-        self.assertEquals("somevalue", value.raw_value)
+        self.assertEquals(" " * 1024 * 8, raw.raw_value)
 
     def test_get_by_key(self):
         repo = self.create_repository()
@@ -66,17 +49,74 @@ class RepoTests(object):
         with self.assertRaises(exceptions.DuplicateEntry):
             repo.create_raw("somekey", "othervalue")
 
-    def test_get_non_existing_entry(self):
-        repo = self.create_repository()
-
-        with self.assertRaises(exceptions.NotFound):
-            repo.get_raw(123)
-
     def test_idx_non_existing_entry(self):
         repo = self.create_repository()
 
         with self.assertRaises(exceptions.NotFound):
             repo.raw_by_key("stg")
+
+
+class TagTests(object):
+    def test_create(self):
+        repo = self.create_repository()
+
+        cls = repo.create_classification("classification")
+
+        self.assertFalse(cls is None)
+        self.assertEquals("classification", cls.name)
+
+    def test_create_same_name(self):
+        repo = self.create_repository()
+        repo.create_classification("classification")
+
+        with self.assertRaises(exceptions.DuplicateEntry):
+            repo.create_classification("classification")
+
+    def test_list_classifications_empty(self):
+        repo = self.create_repository()
+
+        self.assertItemsEqual([], repo.classifications())
+
+    def test_list_classifications_non_empty(self):
+        repo = self.create_repository()
+
+        cls = repo.create_classification("classification")
+
+        self.assertItemsEqual([cls], repo.classifications())
+
+    def test_delete_classification(self):
+        repo = self.create_repository()
+        cls = repo.create_classification("classification")
+
+        repo.delete_classification(cls.id)
+
+        self.assertItemsEqual([], repo.classifications())
+
+    def test_categories_are_empty(self):
+        repo = self.create_repository()
+        cls = repo.create_classification("classification")
+
+        self.assertItemsEqual([], cls.categories)
+
+    def test_add_category(self):
+        repo = self.create_repository()
+        cls = repo.create_classification("classification")
+
+        cat = cls.add_category("cat1")
+
+        self.assertItemsEqual([cat], cls.categories)
+
+    def test_tagg_existing_raw(self):
+        repo = self.create_repository()
+        raw = repo.create_raw('key', 'value')
+        cls = repo.create_classification("classification")
+        cat1 = cls.add_category("cat1")
+
+        raw.tag_with(cat1)
+
+
+class RepoTests(RawTests, TagTests):
+    pass
 
 
 @contextlib.contextmanager
@@ -97,10 +137,10 @@ class TestPersistency(unittest.TestCase):
     def test_change_persists(self):
         with tempdb() as dburl:
             repo = self.create_repository(dburl)
-            id = repo.create_raw('key', 'value')
+            repo.create_raw('key', 'value')
 
             repo = self.create_repository(dburl)
-            self.assertTrue(repo.get_raw(id))
+            self.assertEquals('value', repo.raw_by_key('key').raw_value)
 
 
 class TestSAPixort(RepoTests, unittest.TestCase):
