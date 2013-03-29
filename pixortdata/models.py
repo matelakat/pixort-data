@@ -17,11 +17,3 @@ class SARaw(Base):
     id = Column(Integer, primary_key=True)
     raw_value = Column(String)
     key = Column(String, unique=True)
-
-
-class SAClassification(Base):
-    __tablename__ = 'classifications'
-
-    id = Column(Integer, primary_key=True)
-    category = Column(String)
-    key = Column(String, unique=True)
