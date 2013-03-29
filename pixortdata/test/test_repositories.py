@@ -16,7 +16,7 @@ class RepoTests(object):
         repo = self.create_repository()
 
         id = repo.create_raw("somekey", "somevalue")
-        value = repo.get(id)
+        value = repo.get_raw(id)
 
         self.assertEquals(id, value.id)
 
@@ -31,7 +31,7 @@ class RepoTests(object):
         repo = self.create_repository()
 
         id = repo.create_raw("somekey", " " * 1024 * 8)
-        value = repo.get(id)
+        value = repo.get_raw(id)
 
         self.assertEquals(" " * 1024 * 8, value.raw_value)
 
@@ -39,7 +39,7 @@ class RepoTests(object):
         repo = self.create_repository()
 
         id = repo.create_raw("somekey", "somevalue")
-        value = repo.get(id)
+        value = repo.get_raw(id)
 
         self.assertEquals("somevalue", value.raw_value)
 
@@ -70,7 +70,7 @@ class RepoTests(object):
         repo = self.create_repository()
 
         with self.assertRaises(exceptions.NotFound):
-            repo.get(123)
+            repo.get_raw(123)
 
     def test_idx_non_existing_entry(self):
         repo = self.create_repository()
@@ -100,7 +100,7 @@ class TestPersistency(unittest.TestCase):
             id = repo.create_raw('key', 'value')
 
             repo = self.create_repository(dburl)
-            self.assertTrue(repo.get(id))
+            self.assertTrue(repo.get_raw(id))
 
 
 class TestSAPixort(RepoTests, unittest.TestCase):
