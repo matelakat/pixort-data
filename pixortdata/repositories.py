@@ -84,21 +84,21 @@ class InMemRepo(object):
 
 
 class PixortData(object):
-    def __init__(self, repo):
-        self.repo = repo
+    def __init__(self, raw_repo):
+        self.raw_repo = raw_repo
 
     def create(self, key, value):
-        return self.repo.create(key=key, raw_value=value)
+        return self.raw_repo.create(key=key, raw_value=value)
 
     def get(self, id):
-        return self.repo.get(id)
+        return self.raw_repo.get(id)
 
     def keys(self):
-        for obj in self.repo.query():
+        for obj in self.raw_repo.query():
             yield obj.key
 
     def by_key(self, key):
-        for obj in self.repo.query(lambda x: x.key==key):
+        for obj in self.raw_repo.query(lambda x: x.key==key):
             return obj
         raise exceptions.NotFound(key)
 
