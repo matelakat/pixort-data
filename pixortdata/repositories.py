@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 
-def inmemory_alchemy_session():
+def inmemory_sa_pixort_data():
     return filesystem_alchemy_session('sqlite:///', create_schema=True)
 
 
@@ -19,7 +19,7 @@ def filesystem_alchemy_session(url, create_schema=False):
     engine = sqlalchemy.create_engine(url)
     if create_schema:
         models.Base.metadata.create_all(engine)
-    return AlchemySession(sqlalchemy.orm.sessionmaker(bind=engine)())
+    return SAPixortData(sqlalchemy.orm.sessionmaker(bind=engine)())
 
 
 class SARepo(object):
@@ -83,7 +83,7 @@ class InMemRepo(object):
                 yield obj
 
 
-class RawRepo(object):
+class PixortData(object):
     def __init__(self, repo):
         self.repo = repo
 
@@ -103,9 +103,9 @@ class RawRepo(object):
         raise exceptions.NotFound(key)
 
 
-def AlchemySession(session):
-    return RawRepo(SARepo(session, models.SARaw))
+def SAPixortData(session):
+    return PixortData(SARepo(session, models.SARaw))
 
 
-def InMemory():
-    return RawRepo(InMemRepo(models.RawValue, ["key"]))
+def InMemPixortData():
+    return PixortData(InMemRepo(models.RawValue, ["key"]))

@@ -103,11 +103,11 @@ class TestPersistency(unittest.TestCase):
             self.assertTrue(repo.get(id))
 
 
-class TestAlchemySession(RepoTests, unittest.TestCase):
+class TestSAPixort(RepoTests, unittest.TestCase):
     def create_repository(self):
-        return repositories.inmemory_alchemy_session()
+        return repositories.inmemory_sa_pixort_data()
 
 
-class TestInMemoryRepo(RepoTests, unittest.TestCase):
+class TestInMemPixort(RepoTests, unittest.TestCase):
     def create_repository(self):
-        return repositories.InMemory()
+        return repositories.InMemPixortData()
