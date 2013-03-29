@@ -11,6 +11,7 @@ setup(
             'pixort-data-version = pixortdata.scripts.data:version',
             'pixort-data-upgrade = pixortdata.scripts.data:upgrade',
             'pixort-data-revision = pixortdata.scripts.data:revision',
+            'pixort-data-load-categories = pixortdata.scripts.load:categories',
         ]
     }
 )
