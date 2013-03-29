@@ -97,7 +97,7 @@ class PixortData(object):
         for obj in self.raw_repo.query():
             yield obj.key
 
-    def by_key(self, key):
+    def raw_by_key(self, key):
         for obj in self.raw_repo.query(lambda x: x.key==key):
             return obj
         raise exceptions.NotFound(key)

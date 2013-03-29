@@ -47,7 +47,7 @@ class RepoTests(object):
         repo = self.create_repository()
 
         repo.create_raw("somekey", "somevalue")
-        value = repo.by_key("somekey")
+        value = repo.raw_by_key("somekey")
 
         self.assertEquals("somevalue", value.raw_value)
 
@@ -76,7 +76,7 @@ class RepoTests(object):
         repo = self.create_repository()
 
         with self.assertRaises(exceptions.NotFound):
-            repo.by_key("stg")
+            repo.raw_by_key("stg")
 
 
 @contextlib.contextmanager
