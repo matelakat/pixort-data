@@ -106,7 +106,7 @@ class TagTests(object):
 
         self.assertItemsEqual([cat], cls.categories)
 
-    def test_tagg_existing_raw(self):
+    def test_tag_existing_raw(self):
         repo = self.create_repository()
         raw = repo.create_raw('key', 'value')
         cls = repo.create_classification("classification")
