@@ -9,4 +9,4 @@ def categories():
     parser.add_argument('default_tag', help='Default tag for non classified ones')
     args = parser.parse_args()
 
-    repositories.filesystem_alchemy_session(url=args.dburl)
+    repositories.sa_pixort_data(url=args.dburl)
