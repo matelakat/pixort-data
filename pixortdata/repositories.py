@@ -162,6 +162,10 @@ class PixortData(object):
         cls.remove_all_categories()
         return self.classification_repo.delete(cls.id)
 
+    def get_classification(self, name):
+        for cls in self.classification_repo.query(lambda x: x.name==name):
+            return cls
+
 
 def SAPixortData(session):
     return PixortData(

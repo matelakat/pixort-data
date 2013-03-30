@@ -1,9 +1,7 @@
 import unittest
 from pixortdata import repositories
 from pixortdata import exceptions
-import tempfile
-import os
-import contextlib
+from pixortdata.test import utils
 
 
 class RawTests(object):
@@ -141,19 +139,17 @@ class TagTests(object):
 
         self.assertItemsEqual([], repo.classifications())
 
+    def test_get_classification(self):
+        repo = self.create_repository()
+        cls = repo.create_classification("classification")
+
+        cls2 = repo.get_classification('classification')
+
+        self.assertEquals(cls, cls2)
+
 
 class RepoTests(RawTests, TagTests):
     pass
-
-
-@contextlib.contextmanager
-def tempdb():
-    with tempfile.NamedTemporaryFile(delete=False) as tf:
-        tf.close()
-        try:
-            yield "sqlite:///" + os.path.abspath(tf.name)
-        finally:
-            os.unlink(tf.name)
 
 
 class TestPersistency(unittest.TestCase):
@@ -162,7 +158,7 @@ class TestPersistency(unittest.TestCase):
             url, create_schema=True)
 
     def test_change_persists(self):
-        with tempdb() as dburl:
+        with utils.tempdb() as dburl:
             repo = self.create_repository(dburl)
             repo.create_raw('key', 'value')
 
