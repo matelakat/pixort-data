@@ -1,1 +1,4 @@
 nose
+coverage
+pep8
+sqlalchemy
