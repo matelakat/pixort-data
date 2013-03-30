@@ -4,6 +4,76 @@ from pixortdata.scripts import load
 from pixortdata import repositories
 
 
+class TestLoadExif(unittest.TestCase):
+    def create_repository(self, url):
+        return repositories.sa_pixort_data(
+            url, create_schema=True)
+
+    def test_load_exif(self):
+        with utils.tempdb() as dburl:
+            thumb_data = repr({
+                'thumbnail': {
+                    'format': 100,
+                    'size': 100,
+                    'key2': {
+                        'exif': {
+                            'exifkey': 'exifvalue'
+                        },
+                    }
+                }
+            })
+
+            repo = self.create_repository(dburl)
+            repo.create_raw('key', thumb_data)
+            repo.commit()
+
+            load.exif([dburl])
+
+            p = repo.get_picture('key2')
+            self.assertEquals(None, p.camera_model)
+            self.assertEquals(None, p.datetime)
+
+    def test_load_exif_twice(self):
+        with utils.tempdb() as dburl:
+            thumb_data = repr({
+                'thumbnail': {
+                    'format': 100,
+                    'size': 100,
+                    'key2': {
+                        'exif': {
+                            'exifkey': 'exifvalue'
+                        },
+                    }
+                }
+            })
+
+            repo = self.create_repository(dburl)
+            raw = repo.create_raw('key', thumb_data)
+            repo.commit()
+
+            load.exif([dburl])
+
+            thumb_data = repr({
+                'thumbnail': {
+                    'format': 100,
+                    'size': 100,
+                    'key2': {
+                        'exif': {
+                            'exif:Model': 'somemodel'
+                        },
+                    }
+                }
+            })
+
+            raw.raw_value = thumb_data
+            repo.commit()
+
+            load.exif([dburl])
+
+            p = repo.get_picture('key2')
+            self.assertEquals('somemodel', p.camera_model)
+
+
 class TestLoadCategories(unittest.TestCase):
     def create_repository(self, url):
         return repositories.sa_pixort_data(
@@ -24,6 +94,7 @@ class TestLoadCategories(unittest.TestCase):
         with utils.tempdb() as dburl:
             repo = self.create_repository(dburl)
             repo.create_raw('key', 'value')
+            repo.commit()
 
             self.load(dburl, ['key'])
 
@@ -38,6 +109,7 @@ class TestLoadCategories(unittest.TestCase):
         with utils.tempdb() as dburl:
             repo = self.create_repository(dburl)
             repo.create_raw('key', 'value')
+            repo.commit()
 
             self.load(dburl, ['key', 'key 3', 'key'])
 
@@ -53,6 +125,7 @@ class TestLoadCategories(unittest.TestCase):
             repo = self.create_repository(dburl)
             repo.create_raw('key', 'value')
             repo.create_raw('key1', 'value')
+            repo.commit()
 
             self.load(dburl, ['key', 'key 3', 'key'])
             self.load(dburl, ['key1 87', 'key 3', 'key'])

@@ -51,7 +51,6 @@ class SARepo(object):
             raw = self.cls_to_store(**kwargs)
             self.session.add(raw)
             self.session.flush()
-            self.session.commit()
             return self.injector.inject(raw)
         except sqlalchemy.exc.IntegrityError:
             raise exceptions.DuplicateEntry(kwargs)
@@ -72,6 +71,9 @@ class SARepo(object):
 
     def delete(self, obj):
         self.session.delete(obj)
+        self.session.flush()
+
+    def commit(self):
         self.session.commit()
 
 
@@ -117,23 +119,25 @@ class InMemRepo(object):
     def delete(self, obj):
         self._deleted_objects.append(obj)
 
+    def commit(self):
+        pass
+
 
 class PixortData(object):
-    def __init__(self, raw_repo, classification_repo, tag_repo, category_repo):
+    def __init__(self, **repos):
         def inject(obj):
-            obj.raw_repo = raw_repo
-            obj.classification_repo = classification_repo
-            obj.tag_repo = tag_repo
-            obj.category_repo = category_repo
+            for k, v in repos.items():
+                setattr(obj, k, v)
 
         injector = Injector()
         injector.method = inject
         injector.inject(self)
 
-        raw_repo.injector.method = inject
-        classification_repo.injector.method = inject
-        tag_repo.injector.method = inject
-        category_repo.injector.method = inject
+        for repo in repos.values():
+            repo.injector.method = inject
+
+    def raws(self):
+        return self.raw_repo.query()
 
     def create_raw(self, key, value):
         return self.raw_repo.create(key=key, raw_value=value)
@@ -164,20 +168,35 @@ class PixortData(object):
         for cls in self.classification_repo.query(lambda x: x.name == name):
             return cls
 
+    def pictures(self):
+        return self.picture_repo.query()
+
+    def create_picture(self, key):
+        return self.picture_repo.create(key=key)
+
+    def get_picture(self, key):
+        for pict in self.picture_repo.query(lambda x: x.key == key):
+            return pict
+
+    def commit(self):
+        self.raw_repo.commit()
+
 
 def SAPixortData(session):
     return PixortData(
-        SARepo(session, models.SARaw),
-        SARepo(session, models.SAClassification),
-        SARepo(session, models.SATag),
-        SARepo(session, models.SACategory)
+        raw_repo=SARepo(session, models.SARaw),
+        classification_repo=SARepo(session, models.SAClassification),
+        tag_repo=SARepo(session, models.SATag),
+        category_repo=SARepo(session, models.SACategory),
+        picture_repo=SARepo(session, models.SAPicture),
     )
 
 
 def InMemPixortData():
     return PixortData(
-        InMemRepo(models.RawValue, ["key"]),
-        InMemRepo(models.Classification, ["name"]),
-        InMemRepo(models.Tag, []),
-        InMemRepo(models.Category, []),
+        raw_repo=InMemRepo(models.RawValue, ["key"]),
+        classification_repo=InMemRepo(models.Classification, ["name"]),
+        tag_repo=InMemRepo(models.Tag, []),
+        category_repo=InMemRepo(models.Category, []),
+        picture_repo=InMemRepo(models.Picture, ["key"]),
     )

@@ -12,6 +12,7 @@ setup(
             'pixort-data-upgrade = pixortdata.scripts.data:upgrade',
             'pixort-data-revision = pixortdata.scripts.data:revision',
             'pixort-data-load-categories = pixortdata.scripts.load:categories',
+            'pixort-data-exif-load = pixortdata.scripts.load:exif',
         ]
     }
 )

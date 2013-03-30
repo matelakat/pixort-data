@@ -21,14 +21,18 @@ class Classification(domain.Classification):
 
 
 class RawValue(domain.Raw):
-    def __init__(self, **kwargs):
-        self.id = None
-        self.raw_value = kwargs.get('raw_value')
-        self.key = kwargs.get('key')
+    pass
+
+
+class Picture(domain.Picture):
+    def __init__(self, key=None, camera_model=None, datetime=None):
+        self.key = key
+        self.datetime = datetime
+        self.camera_model = camera_model
 
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
@@ -63,3 +67,12 @@ class SAClassification(Base, domain.Classification):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
+
+
+class SAPicture(Base, domain.Picture):
+    __tablename__ = 'pictures'
+
+    id = Column(Integer, primary_key=True)
+    key = Column(String, unique=True, nullable=False)
+    camera_model = Column(String)
+    datetime = Column(DateTime)
