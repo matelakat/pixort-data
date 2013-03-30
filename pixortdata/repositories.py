@@ -14,18 +14,37 @@ def inmemory_sa_pixort_data():
 
 
 def sa_pixort_data(url, create_schema=False):
+
+    def _fk_pragma_on_connect(dbapi_con, con_record):
+        dbapi_con.execute('pragma foreign_keys=ON')
+
     logging.basicConfig()
     logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     engine = sqlalchemy.create_engine(url)
+
+    if 'sqlite' in url:
+        sqlalchemy.event.listen(engine, 'connect', _fk_pragma_on_connect)
+
     if create_schema:
         models.Base.metadata.create_all(engine)
     return SAPixortData(sqlalchemy.orm.sessionmaker(bind=engine)())
+
+
+class Injector(object):
+    def __init__(self):
+        self.method = None
+
+    def inject(self, obj):
+        if self.method is not None:
+            self.method(obj)
+        return obj
 
 
 class SARepo(object):
     def __init__(self, session, cls_to_store):
         self.session = session
         self.cls_to_store = cls_to_store
+        self.injector = Injector()
 
     def create(self, **kwargs):
         try:
@@ -33,13 +52,13 @@ class SARepo(object):
             self.session.add(raw)
             self.session.flush()
             self.session.commit()
-            return raw
+            return self.injector.inject(raw)
         except sqlalchemy.exc.IntegrityError:
             raise exceptions.DuplicateEntry(kwargs)
 
     def get(self, id):
         for obj in self.query(lambda x: x.id==id):
-            return obj
+            return self.injector.inject(obj)
         raise exceptions.NotFound(id)
 
     def query(self, *conditions):
@@ -49,8 +68,9 @@ class SARepo(object):
             q = q.filter(condition(self.cls_to_store))
 
         for obj in q:
-            yield obj
+            yield self.injector.inject(obj)
 
+    # TODO - do not use id
     def delete(self, id):
         self.session.delete(self.get(id))
         self.session.commit()
@@ -62,13 +82,14 @@ class InMemRepo(object):
         self._deleted_objects = []
         self.cls = cls
         self.unique_fields = unique_fields
+        self.injector = Injector()
 
     @property
     def objects(self):
         for obj in self._objects:
             if obj in self._deleted_objects:
                 continue
-            yield obj
+            yield self.injector.inject(obj)
 
     def create(self, **kwargs):
         new_obj = self.cls(**kwargs)
@@ -81,7 +102,7 @@ class InMemRepo(object):
         self._objects.append(new_obj)
         id = self._objects.index(new_obj)
         new_obj.id = id
-        return new_obj
+        return self.injector.inject(new_obj)
 
     def get(self, id):
         for obj in self.objects:
@@ -99,9 +120,21 @@ class InMemRepo(object):
 
 
 class PixortData(object):
-    def __init__(self, raw_repo, category_repo):
-        self.raw_repo = raw_repo
-        self.category_repo = category_repo
+    def __init__(self, raw_repo, classification_repo, tag_repo, category_repo):
+        def inject(obj):
+            obj.raw_repo = raw_repo
+            obj.classification_repo = classification_repo
+            obj.tag_repo = tag_repo
+            obj.category_repo = category_repo
+
+        injector = Injector()
+        injector.method = inject
+        injector.inject(self)
+
+        raw_repo.injector.method = inject
+        classification_repo.injector.method = inject
+        tag_repo.injector.method = inject
+        category_repo.injector.method = inject
 
     def create_raw(self, key, value):
         return self.raw_repo.create(key=key, raw_value=value)
@@ -119,25 +152,30 @@ class PixortData(object):
         raise exceptions.NotFound(key)
 
     def create_classification(self, name):
-        return self.category_repo.create(name=name)
+        return self.classification_repo.create(name=name)
 
     def classifications(self):
-        return self.category_repo.query()
+        return self.classification_repo.query()
 
     def delete_classification(self, id):
-        return self.category_repo.delete(id)
-
+        cls = self.classification_repo.get(id)
+        cls.remove_all_categories()
+        return self.classification_repo.delete(cls.id)
 
 
 def SAPixortData(session):
     return PixortData(
         SARepo(session, models.SARaw),
-        SARepo(session, models.SAClassification)
+        SARepo(session, models.SAClassification),
+        SARepo(session, models.SATag),
+        SARepo(session, models.SACategory)
     )
 
 
 def InMemPixortData():
     return PixortData(
         InMemRepo(models.RawValue, ["key"]),
-        InMemRepo(models.Classification, ["name"])
+        InMemRepo(models.Classification, ["name"]),
+        InMemRepo(models.Tag, []),
+        InMemRepo(models.Category, []),
     )

@@ -106,13 +106,40 @@ class TagTests(object):
 
         self.assertItemsEqual([cat], cls.categories)
 
-    def test_tag_existing_raw(self):
+    def test_categorise_existing_raw(self):
+        repo = self.create_repository()
+        raw = repo.create_raw('key', 'value')
+        cls = repo.create_classification("classification")
+
+        cat1 = cls.add_category("cat1")
+
+        raw.categorise(cat1)
+
+        self.assertItemsEqual([cat1], raw.get_categories())
+
+    def test_amend_category(self):
+        repo = self.create_repository()
+        raw = repo.create_raw('key', 'value')
+        cls = repo.create_classification("classification")
+
+        cat1 = cls.add_category("cat1")
+        cat2 = cls.add_category("cat2")
+
+        raw.categorise(cat1)
+        raw.categorise(cat2)
+
+        self.assertItemsEqual([cat2], raw.get_categories())
+
+    def test_delete_classification(self):
         repo = self.create_repository()
         raw = repo.create_raw('key', 'value')
         cls = repo.create_classification("classification")
         cat1 = cls.add_category("cat1")
+        raw.categorise(cat1)
 
-        raw.tag_with(cat1)
+        repo.delete_classification(cls.id)
+
+        self.assertItemsEqual([], repo.classifications())
 
 
 class RepoTests(RawTests, TagTests):
