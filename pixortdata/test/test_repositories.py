@@ -86,7 +86,7 @@ class TagTests(object):
         repo = self.create_repository()
         cls = repo.create_classification("classification")
 
-        repo.delete_classification(cls.id)
+        repo.delete_classification(cls)
 
         self.assertItemsEqual([], repo.classifications())
 
@@ -135,7 +135,7 @@ class TagTests(object):
         cat1 = cls.add_category("cat1")
         raw.categorise(cat1)
 
-        repo.delete_classification(cls.id)
+        repo.delete_classification(cls)
 
         self.assertItemsEqual([], repo.classifications())
 

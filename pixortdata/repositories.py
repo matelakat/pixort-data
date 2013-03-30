@@ -70,9 +70,8 @@ class SARepo(object):
         for obj in q:
             yield self.injector.inject(obj)
 
-    # TODO - do not use id
-    def delete(self, id):
-        self.session.delete(self.get(id))
+    def delete(self, obj):
+        self.session.delete(obj)
         self.session.commit()
 
 
@@ -115,8 +114,8 @@ class InMemRepo(object):
             if False not in [r(obj) for r in conditions]:
                 yield obj
 
-    def delete(self, id):
-        self._deleted_objects.append(self.get(id))
+    def delete(self, obj):
+        self._deleted_objects.append(obj)
 
 
 class PixortData(object):
@@ -157,10 +156,9 @@ class PixortData(object):
     def classifications(self):
         return self.classification_repo.query()
 
-    def delete_classification(self, id):
-        cls = self.classification_repo.get(id)
+    def delete_classification(self, cls):
         cls.remove_all_categories()
-        return self.classification_repo.delete(cls.id)
+        return self.classification_repo.delete(cls)
 
     def get_classification(self, name):
         for cls in self.classification_repo.query(lambda x: x.name==name):

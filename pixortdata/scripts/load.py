@@ -14,7 +14,7 @@ def categories(args=None):
 
     cls = repo.get_classification(args.classification)
     if cls:
-        repo.delete_classification(cls.id)
+        repo.delete_classification(cls)
 
     cls = repo.create_classification(args.classification)
 

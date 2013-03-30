@@ -2,7 +2,7 @@ class Raw(object):
     def categorise(self, category):
         for tag in self.tags:
             if tag.category.classification == category.classification:
-                self.tag_repo.delete(tag.id)
+                self.tag_repo.delete(tag)
 
         self.tag_repo.create(raw_id=self.id, category_id=category.id)
 
@@ -25,7 +25,7 @@ class Classification(object):
     def remove_all_categories(self):
         for category in self.categories:
             category.delete_all_tags()
-            self.category_repo.delete(category.id)
+            self.category_repo.delete(category)
 
 
 class TagBO(object):
@@ -47,7 +47,7 @@ class CategoryBO(object):
 
     def delete_all_tags(self):
         for tag in self.tags:
-            self.tag_repo.delete(tag.id)
+            self.tag_repo.delete(tag)
 
 
 
