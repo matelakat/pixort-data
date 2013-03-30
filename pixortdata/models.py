@@ -1,7 +1,7 @@
 from pixortdata import domain
 
 
-class Tag(domain.TagBO):
+class Tag(domain.Tag):
     def __init__(self, category_id, raw_id):
         self.category_id = category_id
         self.raw_id = raw_id
@@ -42,7 +42,7 @@ class SARaw(Base, domain.Raw):
     key = Column(String, unique=True)
 
 
-class SATag(Base, domain.TagBO):
+class SATag(Base, domain.Tag):
     __tablename__ = 'tags'
 
     id = Column(Integer, primary_key=True)

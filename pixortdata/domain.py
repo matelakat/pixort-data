@@ -30,7 +30,7 @@ class Classification(object):
             self.category_repo.delete(category)
 
 
-class TagBO(object):
+class Tag(object):
     @property
     def category(self):
         for cat in (
