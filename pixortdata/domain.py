@@ -1,4 +1,5 @@
 class Raw(object):
+
     def categorise(self, category):
         for tag in self.tags:
             if tag.category.classification == category.classification:
@@ -8,7 +9,7 @@ class Raw(object):
 
     @property
     def tags(self):
-        return self.tag_repo.query(lambda x: x.raw_id==self.id)
+        return self.tag_repo.query(lambda x: x.raw_id == self.id)
 
     def get_categories(self):
         return (tag.category for tag in self.tags)
@@ -20,7 +21,8 @@ class Classification(object):
 
     @property
     def categories(self):
-        return self.category_repo.query(lambda x: x.classification_id==self.id)
+        return self.category_repo.query(
+            lambda x: x.classification_id == self.id)
 
     def remove_all_categories(self):
         for category in self.categories:
@@ -31,23 +33,25 @@ class Classification(object):
 class TagBO(object):
     @property
     def category(self):
-        for cat in self.category_repo.query(lambda x: x.id==self.category_id):
+        for cat in (
+            self.category_repo.query(lambda x: x.id == self.category_id)
+        ):
             return cat
 
 
 class CategoryBO(object):
     @property
     def classification(self):
-        for cls in self.classification_repo.query(lambda x: x.id==self.classification_id):
+        for cls in (
+            self.classification_repo.query(
+                lambda x: x.id == self.classification_id)
+        ):
             return cls
 
     @property
     def tags(self):
-        return self.tag_repo.query(lambda x: x.category_id==self.id)
+        return self.tag_repo.query(lambda x: x.category_id == self.id)
 
     def delete_all_tags(self):
         for tag in self.tags:
             self.tag_repo.delete(tag)
-
-
-

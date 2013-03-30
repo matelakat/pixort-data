@@ -42,7 +42,6 @@ class SARaw(Base, domain.Raw):
     key = Column(String, unique=True)
 
 
-
 class SATag(Base, domain.TagBO):
     __tablename__ = 'tags'
 
@@ -64,4 +63,3 @@ class SAClassification(Base, domain.Classification):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
-

@@ -4,4 +4,3 @@ class DuplicateEntry(Exception):
 
 class NotFound(Exception):
     pass
-

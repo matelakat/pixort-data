@@ -48,4 +48,7 @@ def revision():
     args = parser.parse_args()
     repositories.sa_pixort_data(url=args.dburl)
 
-    command.revision(_get_config(args.dburl), message=args.message, autogenerate=args.autogenerate)
+    command.revision(
+        _get_config(args.dburl),
+        message=args.message,
+        autogenerate=args.autogenerate)

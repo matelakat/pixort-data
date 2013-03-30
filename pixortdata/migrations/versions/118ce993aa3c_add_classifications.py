@@ -15,7 +15,8 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.create_table('classifications',
+    op.create_table(
+        'classifications',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('category', sa.String(), nullable=True),
         sa.Column('key', sa.String(), nullable=True),

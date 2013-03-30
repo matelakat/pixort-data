@@ -6,7 +6,8 @@ def categories(args=None):
     parser = argparse.ArgumentParser(description='Load categories from a file')
     parser.add_argument('dburl', help='Database URL for SQLAlchemy')
     parser.add_argument('classification', help='Name of classification')
-    parser.add_argument('default_category', help='Default tag for non classified ones')
+    parser.add_argument('default_category',
+                        help='Default tag for non classified ones')
     parser.add_argument('fname', help='Name of the file to load')
     args = parser.parse_args(args=args or sys.argv)
 

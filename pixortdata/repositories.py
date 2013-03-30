@@ -57,7 +57,7 @@ class SARepo(object):
             raise exceptions.DuplicateEntry(kwargs)
 
     def get(self, id):
-        for obj in self.query(lambda x: x.id==id):
+        for obj in self.query(lambda x: x.id == id):
             return self.injector.inject(obj)
         raise exceptions.NotFound(id)
 
@@ -146,7 +146,7 @@ class PixortData(object):
             yield obj.key
 
     def raw_by_key(self, key):
-        for obj in self.raw_repo.query(lambda x: x.key==key):
+        for obj in self.raw_repo.query(lambda x: x.key == key):
             return obj
         raise exceptions.NotFound(key)
 
@@ -161,7 +161,7 @@ class PixortData(object):
         return self.classification_repo.delete(cls)
 
     def get_classification(self, name):
-        for cls in self.classification_repo.query(lambda x: x.name==name):
+        for cls in self.classification_repo.query(lambda x: x.name == name):
             return cls
 
 
