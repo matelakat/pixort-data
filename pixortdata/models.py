@@ -7,7 +7,7 @@ class Tag(domain.Tag):
         self.raw_id = raw_id
 
 
-class Category(domain.CategoryBO):
+class Category(domain.Category):
     def __init__(self, name, classification_id):
         self.id = None
         self.classification_id = classification_id
@@ -50,7 +50,7 @@ class SATag(Base, domain.Tag):
     category_id = Column(Integer, ForeignKey('categories.id'))
 
 
-class SACategory(Base, domain.CategoryBO):
+class SACategory(Base, domain.Category):
     __tablename__ = 'categories'
 
     id = Column(Integer, primary_key=True)

@@ -39,7 +39,7 @@ class Tag(object):
             return cat
 
 
-class CategoryBO(object):
+class Category(object):
     @property
     def classification(self):
         for cls in (
