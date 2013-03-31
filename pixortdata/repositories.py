@@ -55,11 +55,6 @@ class SARepo(object):
         except sqlalchemy.exc.IntegrityError:
             raise exceptions.DuplicateEntry(kwargs)
 
-    def get(self, id):
-        for obj in self.query(lambda x: x.id == id):
-            return self.injector.inject(obj)
-        raise exceptions.NotFound(id)
-
     def query(self, *conditions):
         q = self.session.query(self.cls_to_store)
 
@@ -105,12 +100,6 @@ class InMemRepo(object):
         new_obj.id = id
         return self.injector.inject(new_obj)
 
-    def get(self, id):
-        for obj in self.objects:
-            if id == obj.id:
-                return obj
-        raise exceptions.NotFound(id)
-
     def query(self, *conditions):
         for obj in self.objects:
             if False not in [r(obj) for r in conditions]:
@@ -141,9 +130,6 @@ class PixortData(object):
 
     def create_raw(self, key, value):
         return self.raw_repo.create(key=key, raw_value=value)
-
-    def get_raw(self, id):
-        return self.raw_repo.get(id)
 
     def keys(self):
         for obj in self.raw_repo.query():
