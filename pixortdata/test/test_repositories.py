@@ -210,7 +210,26 @@ class PictureTests(object):
         self.assertItemsEqual([pict], repo.pictures())
 
 
-class RepoTests(RawTests, TagTests, PictureTests):
+class ThumbnailTests(object):
+    def test_get_thumbs(self):
+        repo = self.create_repository()
+
+        pict = repo.create_picture('key')
+
+        self.assertItemsEqual([], pict.thumbnails)
+
+    def test_add_thumbnail(self):
+        repo = self.create_repository()
+
+        pict = repo.create_picture('key')
+        thumb = repo.create_picture('key2')
+
+        pict.add_thumbnail(thumb, 100)
+
+        self.assertItemsEqual([thumb], pict.thumbnails)
+
+
+class RepoTests(RawTests, TagTests, PictureTests, ThumbnailTests):
     pass
 
 

@@ -31,8 +31,13 @@ class Picture(domain.Picture):
         self.camera_model = camera_model
 
 
+class Relation(domain.Relation):
+    pass
+
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
@@ -76,3 +81,25 @@ class SAPicture(Base, domain.Picture):
     key = Column(String, unique=True, nullable=False)
     camera_model = Column(String)
     datetime = Column(DateTime)
+
+    def add_thumbnail(self, picture, size):
+        self.relations_repo.create(
+            src_id=picture.id,
+            relation_name="thumb_of",
+            tgt_id=self.id,
+            size=size)
+
+
+class SARelation(Base, domain.Relation):
+    __tablename__ = 'relations'
+    __table_args__ = (
+        UniqueConstraint(
+            'relation_name', 'src_id', 'tgt_id'),
+    )
+
+    id = Column(Integer, primary_key=True)
+    relation_name = Column(String, nullable=False)
+    size = Column(Integer)
+
+    src_id = Column(Integer, ForeignKey('pictures.id'), nullable=False)
+    tgt_id = Column(Integer, ForeignKey('pictures.id'), nullable=False)

@@ -4,6 +4,45 @@ import datetime
 import unittest
 
 
+class TestRawIsThumb(unittest.TestCase):
+    def test_is_thumb_on_thumbnail(self):
+        thumb_data = repr({'thumbnail': {}})
+
+        raw = domain.Raw(raw_value=thumb_data)
+
+        self.assertTrue(raw.is_thumb)
+
+    def test_is_thumb_on_non_thumbnail(self):
+        thumb_data = repr({})
+
+        raw = domain.Raw(raw_value=thumb_data)
+
+        self.assertFalse(raw.is_thumb)
+
+    def test_is_thumb_on_invalid(self):
+        thumb_data = 'invalid'
+
+        raw = domain.Raw(raw_value=thumb_data)
+
+        self.assertFalse(raw.is_thumb)
+
+
+class TestRawSize(unittest.TestCase):
+    def test_proper_data(self):
+        thumb_data = repr({'thumbnail': {'size': 100}})
+
+        raw = domain.Raw(raw_value=thumb_data)
+
+        self.assertEquals(100, raw.size)
+
+    def test_invalid_data(self):
+        thumb_data = 'blah'
+
+        raw = domain.Raw(raw_value=thumb_data)
+
+        self.assertEquals(None, raw.size)
+
+
 class TestExif(unittest.TestCase):
     def test_exif_info_on_thumb(self):
         thumb_data = repr({

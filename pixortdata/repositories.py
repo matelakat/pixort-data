@@ -175,6 +175,7 @@ def SAPixortData(session):
         tag_repo=SARepo(session, models.SATag),
         category_repo=SARepo(session, models.SACategory),
         picture_repo=SARepo(session, models.SAPicture),
+        relations_repo=SARepo(session, models.SARelation),
     )
 
 
@@ -185,4 +186,5 @@ def InMemPixortData():
         tag_repo=InMemRepo(models.Tag, []),
         category_repo=InMemRepo(models.Category, []),
         picture_repo=InMemRepo(models.Picture, ["key"]),
+        relations_repo=InMemRepo(models.Relation, []),
     )

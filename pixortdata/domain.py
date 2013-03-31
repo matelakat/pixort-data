@@ -56,6 +56,16 @@ class Raw(object):
 
         return result
 
+    @property
+    @suppress_exceptions(lambda: False)
+    def is_thumb(self):
+        return 'thumbnail' in self.evaled
+
+    @property
+    @suppress_exceptions()
+    def size(self):
+        return self.evaled['thumbnail']['size']
+
 
 class Classification(object):
     def add_category(self, name):
@@ -107,6 +117,24 @@ class Picture(object):
         self.datetime = exif_info.datetime_original
         self.camera_model = exif_info.model
 
+    @property
+    def thumbnails(self):
+        for relation in self.relations_repo.query(
+            lambda x: x.relation_name == "thumb_of",
+            lambda x: x.tgt_id == self.id
+        ):
+            for thumb in self.picture_repo.query(
+                lambda x: x.id == relation.src_id
+            ):
+                yield thumb
+
+    def add_thumbnail(self, picture, size):
+        self.relations_repo.create(
+            src_id=picture.id,
+            relation_name="thumb_of",
+            tgt_id=self.id,
+            size=size)
+
 
 def _parse_exif_date(date):
     if date == "0000:00:00 00:00:00":
@@ -131,3 +159,11 @@ class ExifInfo(object):
     def __init__(self, datetime_original, model):
         self.datetime_original = datetime_original
         self.model = model
+
+
+class Relation(object):
+    def __init__(self, src_id, relation_name, tgt_id, size):
+        self.relation_name = relation_name
+        self.src_id = src_id
+        self.tgt_id = tgt_id
+        self.size = size

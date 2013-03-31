@@ -13,6 +13,7 @@ setup(
             'pixort-data-revision = pixortdata.scripts.data:revision',
             'pixort-data-load-categories = pixortdata.scripts.load:categories',
             'pixort-data-exif-load = pixortdata.scripts.load:exif',
+            'pixort-data-load-thumbs = pixortdata.scripts.load:thumbs',
         ]
     }
 )
